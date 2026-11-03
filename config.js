@@ -8,7 +8,7 @@ window.GRANTFLOW_FORMS = [
     summary: "The full end-of-grant MEAL report: award use, beneficiaries, locations, deliverables, learning and a case study.",
     time: "40–60 minutes",
     sections: ["A · Grant award", "B · Use of award", "C · Beneficiaries", "D · Reach", "F · Finance", "G · Locations", "H · Deliverables", "J · Learning", "K · Impact and case study"],
-    url: ""
+    url: "https://docs.google.com/forms/d/e/1FAIpQLSc6MI1lSCi_u_1zAZlwRv6Mdt70YIoIZZlQ-IT5o4f1RA7uOQ/viewform"
   },
   {
     id: "iffs-questionnaire",
@@ -16,6 +16,6 @@ window.GRANTFLOW_FORMS = [
     summary: "Fishing safety indicators: accident statistics, safety management, training, equipment, standards and knowledge sharing.",
     time: "25–40 minutes",
     sections: ["A · Safety statistics", "B · Safety management", "C · Training reach", "D · Personnel and equipment", "E · Standards", "F · Knowledge sharing", "Case study"],
-    url: ""
+    url: "https://docs.google.com/forms/d/e/1FAIpQLSeIVRP-sX7a3FudTdlJyM5hqSjZwusqqy3soR4Eg10Hi6zYzw/viewform"
   }
 ];
