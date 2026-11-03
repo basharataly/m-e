@@ -1,0 +1,78 @@
+// Reads the original app's two forms and writes create-forms.gs,
+// a Google Apps Script that recreates them as Google Forms.
+// Run from the project root: node pages/tools/build-apps-script.mjs
+import { readFileSync, writeFileSync } from "node:fs";
+
+const kobo = readFileSync("app/kobo-form.tsx", "utf8").split("\n").slice(41, 49);
+
+const grant = [];
+kobo.forEach((line) => {
+  const section = line.match(/<Section [^>]*title="([^"]+)"/);
+  if (section) grant.push({ type: "section", title: section[1] });
+  const re = /<(Text|Area|Radio|Choices) label=\{?([`"])(.+?)\2\}?([^>]*?)\/>/g;
+  for (const m of line.matchAll(re)) {
+    const [, comp, , rawLabel, rest] = m;
+    if (rawLabel === "Secure account") continue;
+    const opts = rest.match(/options=\{\[([^\]]*)\]\}/);
+    const options = opts ? [...opts[1].matchAll(/"([^"]+)"/g)].map((o) => o[1]) : null;
+    const required = rawLabel.includes("*");
+    const label = rawLabel.replace(/\s*\*\s*$/, "");
+    const isNum = /type="number"/.test(rest);
+    const isDate = /type="date"/.test(rest);
+    const labels = label.includes("${n}") ? [1, 2, 3].map((n) => label.replace("${n}", n)) : [label];
+    for (const l of labels) {
+      if (comp === "Radio") grant.push({ type: "choice", label: l, required, options: options || ["Yes", "No"] });
+      else if (comp === "Choices") grant.push({ type: "checkbox", label: l, required, options: options || ["Other"] });
+      else if (comp === "Area") grant.push({ type: "paragraph", label: l, required: required && !l.startsWith("H") });
+      else grant.push({ type: isDate ? "date" : isNum ? "number" : "text", label: l, required: required && !/^H\d/.test(l) });
+    }
+  }
+});
+
+const iffsSrc = readFileSync("db/iffs-form.ts", "utf8");
+const iffs = [];
+for (const m of iffsSrc.matchAll(/\{id:"[^"]+",type:"(\w+)",label:"([^"]+)"(?:,helpText:"([^"]*)")?(?:,required:(true|false))?(?:,options:\[([^\]]*)\])?/g)) {
+  const [, t, label, help, req, opts] = m;
+  const options = opts ? [...opts.matchAll(/"([^"]+)"/g)].map((o) => o[1]) : null;
+  const type = { short_text: "text", long_text: "paragraph", number: "number", yes_no: "choice", single_select: "choice", multi_select: "checkbox" }[t];
+  // Conditional questions are optional here, since Google Forms can't show them conditionally inside one section.
+  iffs.push({ type, label, help, required: req === "true" && !/condition/.test(m.input.slice(m.index, m.input.indexOf("}", m.index + m[0].length) + 2)), options: options || (t === "yes_no" ? ["Yes", "No"] : null) });
+}
+
+const spec = [
+  { title: "GrantFlow — Grant report", description: "End-of-grant MEAL report. Do not submit personal participant data or details of safeguarding cases.", items: grant },
+  { title: "GrantFlow — IFFS M&E questionnaire", description: "Fishing safety indicators. If exact figures are unavailable, provide your best estimate. Do not submit personal participant data.", items: iffs },
+];
+
+const gs = `// Creates the GrantFlow Google Forms and links each to a response Sheet.
+// Paste into a new project at script.google.com and run createForms.
+const SPEC = ${JSON.stringify(spec, null, 1)};
+
+function createForms() {
+  const out = [];
+  SPEC.forEach(function (f) {
+    const form = FormApp.create(f.title).setDescription(f.description)
+      .setCollectEmail(true).setAllowResponseEdits(true).setProgressBar(true);
+    f.items.forEach(function (q) {
+      let item;
+      if (q.type === "section") { form.addPageBreakItem().setTitle(q.title); return; }
+      if (q.type === "paragraph") item = form.addParagraphTextItem();
+      else if (q.type === "date") item = form.addDateItem();
+      else if (q.type === "choice") item = form.addMultipleChoiceItem().setChoiceValues(q.options);
+      else if (q.type === "checkbox") item = form.addCheckboxItem().setChoiceValues(q.options);
+      else {
+        item = form.addTextItem();
+        if (q.type === "number") item.setValidation(FormApp.createTextValidation().requireNumber().build());
+      }
+      item.setTitle(q.label).setRequired(!!q.required);
+      if (q.help) item.setHelpText(q.help);
+    });
+    const sheet = SpreadsheetApp.create(f.title + " (responses)");
+    form.setDestination(FormApp.DestinationType.SPREADSHEET, sheet.getId());
+    out.push(f.title + "\\n  " + form.getPublishedUrl() + "\\n  edit: " + form.getEditUrl() + "\\n  sheet: " + sheet.getUrl());
+  });
+  Logger.log(out.join("\\n"));
+}
+`;
+writeFileSync("pages/tools/create-forms.gs", gs);
+console.log(`grant: ${grant.filter((q) => q.type !== "section").length} questions, iffs: ${iffs.length} questions`);
