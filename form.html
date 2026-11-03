@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GrantFlow | Form</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="./"><span class="logo">G</span>GrantFlow MEAL</a>
+  <nav><a href="./#forms">All forms</a></nav>
+</div></header>
+
+<main class="wrap">
+  <section>
+    <div class="eyebrow" id="time"></div>
+    <h1 id="title">Form</h1>
+    <p class="lead" id="summary"></p>
+    <p id="open-tab"></p>
+    <div id="body"></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Do not submit personal participant data or details of safeguarding cases.</div></footer>
+
+<script src="config.js"></script>
+<script>
+  // Turns any Google Forms link into its embeddable form.
+  function embedUrl(url) {
+    if (url.includes("forms.gle/")) return url; // short links redirect; Google allows embedding the result
+    const u = new URL(url);
+    u.pathname = u.pathname.replace(/\/(edit|viewform|formResponse)?$/, "/viewform");
+    u.searchParams.set("embedded", "true");
+    return u.toString();
+  }
+
+  const id = new URLSearchParams(location.search).get("f");
+  const form = window.GRANTFLOW_FORMS.find(f => f.id === id);
+  const body = document.getElementById("body");
+
+  if (!form) {
+    document.getElementById("title").textContent = "Form not found";
+    body.innerHTML = '<p><a class="btn" href="./#forms">Back to all forms</a></p>';
+  } else {
+    document.title = "GrantFlow | " + form.title;
+    document.getElementById("title").textContent = form.title;
+    document.getElementById("summary").textContent = form.summary;
+    document.getElementById("time").textContent = "Takes about " + form.time;
+    if (!form.url) {
+      body.innerHTML = '<div class="notice"><strong>This form is not available yet.</strong> Please check back soon or contact your grants officer.</div>';
+    } else {
+      const a = document.createElement("a");
+      a.className = "btn ghost"; a.href = form.url; a.target = "_blank"; a.rel = "noopener";
+      a.textContent = "Open in a new tab";
+      document.getElementById("open-tab").append(a);
+      const frame = document.createElement("div");
+      frame.className = "frame";
+      const iframe = document.createElement("iframe");
+      iframe.src = embedUrl(form.url);
+      iframe.title = form.title;
+      iframe.loading = "lazy";
+      frame.append(iframe);
+      body.append(frame);
+    }
+  }
+</script>
+</body>
+</html>

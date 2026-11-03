@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GrantFlow | Grantee MEAL Reporting</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="./"><span class="logo">G</span>GrantFlow MEAL</a>
+  <nav><a href="#forms">Forms</a><a href="#how">How it works</a><a href="#data">Data</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Grantee monitoring, evaluation &amp; learning</div>
+    <h1>Grant reporting, evidence and review in one place.</h1>
+    <p class="lead">Choose the form for your grant, complete it online and submit. Your answers go straight to the grants team for review.</p>
+    <p><a class="btn" href="#forms">Choose a form</a></p>
+  </div>
+
+  <section id="forms">
+    <h2>Choose what you need to complete</h2>
+    <div class="grid" id="form-list"></div>
+  </section>
+
+  <section id="how">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li><strong>Gather your evidence.</strong> Have your grant number, award amount, beneficiary figures and deliverable evidence ready.</li>
+      <li><strong>Complete the form.</strong> Sign in to Google if you want to save progress and come back later.</li>
+      <li><strong>Upload files where asked.</strong> Supporting evidence is uploaded inside the form.</li>
+      <li><strong>Submit and get a copy.</strong> You'll get a confirmation email with your answers.</li>
+    </ol>
+  </section>
+
+  <section id="data">
+    <div class="notice">
+      <strong>Data protection:</strong> Do not submit personal participant data or details of safeguarding cases. Report numbers and anonymised examples only.
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">GrantFlow MEAL reporting · Questions? Contact your grants officer.</div></footer>
+
+<script src="config.js"></script>
+<script>
+  const list = document.getElementById("form-list");
+  for (const f of window.GRANTFLOW_FORMS) {
+    const card = document.createElement("article");
+    card.className = "card";
+    card.innerHTML = `<h3></h3><p></p><div class="meta"></div><div class="tags"></div><a class="btn">Open form</a>`;
+    card.querySelector("h3").textContent = f.title;
+    card.querySelector("p").textContent = f.summary;
+    card.querySelector(".meta").textContent = "Takes about " + f.time;
+    const tags = card.querySelector(".tags");
+    for (const s of f.sections) { const t = document.createElement("span"); t.textContent = s; tags.append(t); }
+    card.querySelector("a").href = "form.html?f=" + encodeURIComponent(f.id);
+    list.append(card);
+  }
+</script>
+</body>
+</html>
