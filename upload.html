@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GrantFlow | Upload evidence</title>
+<link rel="stylesheet" href="styles.css?v=4">
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="./"><span class="logo">G</span>GrantFlow MEAL</a>
+  <nav><a href="./#forms">All forms</a></nav>
+</div></header>
+
+<main class="wrap">
+  <section>
+    <div class="eyebrow">No Google account needed</div>
+    <h1>Upload supporting evidence</h1>
+    <p class="lead">Send reports, photos, attendance sheets or other files for your grant. They go straight to the grants team.</p>
+
+    <form id="upload" class="card upload-form">
+      <label>Grant number *<input name="grant" required maxlength="40"></label>
+      <label>Organisation *<input name="org" required maxlength="120"></label>
+      <label>Your email *<input name="email" type="email" required maxlength="120"></label>
+      <label>Which report are these for? *
+        <select name="form" id="form-select" required></select>
+      </label>
+      <label>Files * <span class="meta">Up to 10 files, 25 MB each</span>
+        <input name="files" type="file" multiple required>
+      </label>
+      <button class="btn" type="submit">Upload files</button>
+      <ul id="status" class="status"></ul>
+    </form>
+
+    <div class="notice" style="margin-top:20px">Do not upload personal participant data or details of safeguarding cases.</div>
+  </section>
+</main>
+
+<footer><div class="wrap">GrantFlow MEAL reporting · Questions? Contact your grants officer.</div></footer>
+
+<script src="config.js?v=4"></script>
+<script>
+  const MAX_FILES = 10, MAX_BYTES = 25 * 1024 * 1024;
+  const form = document.getElementById("upload");
+  const status = document.getElementById("status");
+  const select = document.getElementById("form-select");
+  for (const f of window.GRANTFLOW_FORMS) select.append(new Option(f.title, f.title));
+  const pre = new URLSearchParams(location.search).get("f");
+  const match = window.GRANTFLOW_FORMS.find(f => f.id === pre);
+  if (match) select.value = match.title;
+
+  function line(text, cls) {
+    const li = document.createElement("li");
+    li.textContent = text; li.className = cls || "";
+    status.append(li); return li;
+  }
+
+  function toBase64(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result.split(",")[1]);
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    status.innerHTML = "";
+    const fd = new FormData(form);
+    const files = [...form.files.files];
+    if (files.length > MAX_FILES) return line(`Please choose ${MAX_FILES} files or fewer.`, "err");
+    const button = form.querySelector("button");
+    button.disabled = true;
+    let ok = 0;
+    for (const file of files) {
+      const li = line(`Uploading ${file.name}…`);
+      if (file.size > MAX_BYTES) { li.textContent = `${file.name}: larger than 25 MB, skipped`; li.className = "err"; continue; }
+      try {
+        const res = await fetch(window.GRANTFLOW_UPLOAD_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" }, // avoids a CORS preflight Apps Script can't answer
+          body: JSON.stringify({ name: file.name, type: file.type, data: await toBase64(file), grant: fd.get("grant"), org: fd.get("org"), email: fd.get("email"), form: fd.get("form") })
+        }).then(r => r.json());
+        if (!res.ok) throw new Error(res.error);
+        li.textContent = `${file.name}: uploaded`; li.className = "ok"; ok++;
+      } catch (err) {
+        li.textContent = `${file.name}: failed (${err.message}). Please try again.`; li.className = "err";
+      }
+    }
+    button.disabled = false;
+    if (ok === files.length) { line(`All ${ok} file(s) received. Thank you.`, "ok"); form.files.value = ""; }
+  });
+</script>
+</body>
+</html>

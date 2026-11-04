@@ -1,6 +1,9 @@
 // Paste each Google Form's link here. Either the share link
 // (https://forms.gle/...) or the long link
 // (https://docs.google.com/forms/d/e/.../viewform) works.
+// Web app from tools/upload-server.gs; saves evidence to Drive without a Google sign-in.
+window.GRANTFLOW_UPLOAD_URL = "https://script.google.com/macros/s/AKfycbyarWIU0Y-Pr4VjF2ARDEsK4Xjd0z94yDkpTUd11fWtvtXOinL9iChtuE7PQON75H1Bcg/exec";
+
 window.GRANTFLOW_FORMS = [
   {
     id: "grant-report",

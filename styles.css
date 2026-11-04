@@ -32,5 +32,13 @@ section{padding:32px 0}
 .notice + .frame{margin-top:16px}
 .frame{background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .frame iframe{display:block;width:100%;height:80vh;min-height:600px;border:0}
+.upload-form{max-width:640px}
+.upload-form label{display:flex;flex-direction:column;gap:6px;font-weight:600}
+.upload-form input,.upload-form select{font:inherit;font-weight:400;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+.upload-form button{align-self:flex-start;border:0;cursor:pointer;font:inherit;font-weight:700}
+.upload-form button:disabled{opacity:.6;cursor:wait}
+.status{list-style:none;padding:0;margin:0;display:grid;gap:4px}
+.status .ok{color:var(--teal)}
+.status .err{color:#a33b2a}
 footer{border-top:1px solid var(--line);margin-top:48px;padding:24px 0;color:var(--muted);font-size:14px}
 @media (max-width:600px){nav a{margin-left:12px}.hero{padding:40px 0 24px}}
