@@ -1,6 +1,10 @@
 // Paste each Google Form's link here. Either the share link
 // (https://forms.gle/...) or the long link
 // (https://docs.google.com/forms/d/e/.../viewform) works.
+// Microsoft 365 receiver (answers to SharePoint list, files to document library).
+// While empty, form pages show the Google Forms below.
+window.GRANTFLOW_SUBMIT_URL = "";
+
 // Web app from tools/upload-server.gs; saves evidence to Drive without a Google sign-in.
 window.GRANTFLOW_UPLOAD_URL = "https://script.google.com/macros/s/AKfycbyarWIU0Y-Pr4VjF2ARDEsK4Xjd0z94yDkpTUd11fWtvtXOinL9iChtuE7PQON75H1Bcg/exec";
 

@@ -40,5 +40,17 @@ section{padding:32px 0}
 .status{list-style:none;padding:0;margin:0;display:grid;gap:4px}
 .status .ok{color:var(--teal)}
 .status .err{color:#a33b2a}
+.native-form{gap:8px}
+.native-form fieldset{border:0;border-top:1px solid var(--line);margin:16px 0 0;padding:16px 0 0;display:grid;gap:20px}
+.native-form fieldset:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.native-form legend{font-size:20px;font-weight:700;padding:0;margin-bottom:8px}
+.native-form .q{display:flex;flex-direction:column;gap:6px}
+.native-form .q>label{font-weight:600}
+.native-form .q .meta{margin:0}
+.native-form input:not([type=radio]):not([type=checkbox]),.native-form textarea{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);max-width:100%}
+.native-form .choices{display:grid;gap:6px}
+.native-form .choices label{font-weight:400}
+.native-form button{align-self:flex-start;border:0;cursor:pointer;font:inherit;font-weight:700;margin-top:16px}
+.native-form button:disabled{opacity:.6;cursor:wait}
 footer{border-top:1px solid var(--line);margin-top:48px;padding:24px 0;color:var(--muted);font-size:14px}
 @media (max-width:600px){nav a{margin-left:12px}.hero{padding:40px 0 24px}}

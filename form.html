@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GrantFlow | Form</title>
-<link rel="stylesheet" href="styles.css?v=4">
+<link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
 <header><div class="wrap">
@@ -24,7 +24,9 @@
 
 <footer><div class="wrap">Do not submit personal participant data or details of safeguarding cases.</div></footer>
 
-<script src="config.js?v=4"></script>
+<script src="config.js?v=5"></script>
+<script src="forms-spec.js?v=5"></script>
+<script src="native-form.js?v=5"></script>
 <script>
   // Turns any Google Forms link into its embeddable form.
   function embedUrl(url) {
@@ -47,7 +49,12 @@
     document.getElementById("title").textContent = form.title;
     document.getElementById("summary").textContent = form.summary;
     document.getElementById("time").textContent = "Takes about " + form.time;
-    if (!form.url) {
+    const spec = window.GRANTFLOW_SPEC[form.id];
+    const preview = new URLSearchParams(location.search).has("native");
+    if (spec && (window.GRANTFLOW_SUBMIT_URL || preview)) {
+      // Site's own form, uploads included; preview mode has no receiver yet.
+      renderNativeForm(body, form, spec, window.GRANTFLOW_SUBMIT_URL || "about:blank");
+    } else if (!form.url) {
       body.innerHTML = '<div class="notice"><strong>This form is not available yet.</strong> Please check back soon or contact your grants officer.</div>';
     } else {
       const a = document.createElement("a");
