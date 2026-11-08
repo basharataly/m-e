@@ -10,3 +10,5 @@ A static M&E reporting site. Forms are Google Forms embedded in the page, and re
 After editing `config.js`, bump the `?v=` number on its `<script>` tag in both HTML files so visitors don't get a cached copy.
 
 Adding another form means adding another entry to `config.js`.
+
+To move collection to the charity account, follow [WORK_ACCOUNT_SETUP.md](WORK_ACCOUNT_SETUP.md). Changing an email address alone does not change Google Drive ownership.

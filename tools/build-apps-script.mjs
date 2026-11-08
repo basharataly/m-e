@@ -64,10 +64,15 @@ const gs = `// Creates the GrantFlow Google Forms and links each to a response S
 const SPEC = ${JSON.stringify(spec, null, 1)};
 
 function createForms() {
+  const expected = "basharat.ali@theseafarerscharity.org";
+  if (Session.getEffectiveUser().getEmail().toLowerCase() !== expected) {
+    throw new Error("Sign in as " + expected + " before creating the forms.");
+  }
   const out = [];
   SPEC.forEach(function (f) {
     const form = FormApp.create(f.title).setDescription(f.description)
-      .setCollectEmail(true).setAllowResponseEdits(true).setProgressBar(true);
+      .setAllowResponseEdits(true).setProgressBar(true);
+    form.setEmailCollectionType(FormApp.EmailCollectionType.RESPONDER_INPUT);
     f.items.forEach(function (q) {
       let item;
       if (q.type === "section") { form.addPageBreakItem().setTitle(q.title); return; }
