@@ -72,7 +72,9 @@ function createForms() {
   SPEC.forEach(function (f) {
     const form = FormApp.create(f.title).setDescription(f.description)
       .setAllowResponseEdits(true).setProgressBar(true);
-    form.setEmailCollectionType(FormApp.EmailCollectionType.RESPONDER_INPUT);
+    form.setCollectEmail(false).setLimitOneResponsePerUser(false);
+    form.addTextItem().setTitle("Your email").setRequired(true)
+      .setValidation(FormApp.createTextValidation().requireTextIsEmail().build());
     f.items.forEach(function (q) {
       let item;
       if (q.type === "section") { form.addPageBreakItem().setTitle(q.title); return; }
